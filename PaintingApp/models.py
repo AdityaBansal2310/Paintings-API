@@ -8,4 +8,5 @@ class Painting(models.Model):
     Description = models.CharField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    Price = models.IntegerField(max_length=10000)
+    Price = models.IntegerField()
+    image_url = models.CharField(max_length=1000, null = True)
