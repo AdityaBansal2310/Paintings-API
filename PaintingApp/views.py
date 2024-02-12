@@ -3,16 +3,17 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Painting
 from .serializers import PaintingSerializer
+import ipdb;
 
 class PaintingApiView(APIView):
     def get(self, request, painting_ID=None):
         if painting_ID:
-            # Retrieve a specific painting by ID
+            
             painting = Painting.objects.get(ID=painting_ID)
             serializer = PaintingSerializer(painting)
             return Response(serializer.data)
         else:
-            # Retrieve all paintings
+            
             paintings = Painting.objects.all()
             serializer = PaintingSerializer(paintings, many=True)
             return Response(serializer.data)
@@ -24,8 +25,27 @@ class PaintingApiView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-    # def delete(self, request, painting_ID):
-    #     painting = Painting.objects.get(ID=painting_ID)
-    #     painting.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, painting_ID):
+        try:
+            print("Testing")
+            painting = Painting.objects.get(ID=painting_ID)
+            print(painting_ID)
+            print(painting_ID)
+        except Painting.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        print(painting.ID)
+        painting.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def put(self, request, painting_ID):
+        try:
+            painting = Painting.objects.get(ID=painting_ID)
+        except Painting.DoesNotExist:
+            return Response({'error': 'Painting not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = PaintingSerializer(painting, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
