@@ -49,3 +49,16 @@ class PaintingApiView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    def patch(self, request, painting_ID):
+        try:
+            painting = Painting.objects.get(ID=painting_ID)
+        except Painting.DoesNotExist:
+            return Response({'error': 'Painting not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = PaintingSerializer(painting, data=request.data, partial=True)  # Set partial=True for partial updates
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
