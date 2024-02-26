@@ -19,7 +19,8 @@ INSTALLED_APPS = [
     'PaintingApp',
     'rest_framework.authtoken', 
     'corsheaders' ,
-    'accounts'
+    'accounts',
+    
 ]
 
 REST_FRAMEWORK = {

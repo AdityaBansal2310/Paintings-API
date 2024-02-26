@@ -4,8 +4,13 @@ from rest_framework import status
 from .models import Painting
 from .serializers import PaintingSerializer
 import ipdb;
+from rest_framework.permissions import IsAuthenticated
+
+
+
 
 class PaintingApiView(APIView):
+    permission_classes = (IsAuthenticated,)             # <-- And here
     def get(self, request, painting_ID=None):
         if painting_ID:
             
