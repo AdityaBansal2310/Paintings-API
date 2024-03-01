@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('painting/', PaintingApiView.as_view(), name='painting-list'),
     path('painting/<int:painting_ID>/', PaintingApiView.as_view(), name='paining-detail'),
     path('api/', include('accounts.urls')),

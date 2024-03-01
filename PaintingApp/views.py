@@ -4,13 +4,16 @@ from rest_framework import status
 from .models import Painting
 from .serializers import PaintingSerializer
 import ipdb;
-# from rest_framework.permissions import IsAuthenticated
 
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import DjangoModelPermissions
 
 
 class PaintingApiView(APIView):
-    # permission_classes = (IsAuthenticated,)             # <-- And here
+    permission_classes = (IsAuthenticated,)
+    queryset = Painting.objects.all()  # Added .queryset attribute
+    permission_classes = [DjangoModelPermissions]  # Using DjangoModelPermissions
+
     def get(self, request, painting_ID=None):
         if painting_ID:
             
