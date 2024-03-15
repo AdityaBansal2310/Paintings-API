@@ -11,8 +11,8 @@ from rest_framework.permissions import DjangoModelPermissions
 
 class PaintingApiView(APIView):
     permission_classes = (IsAuthenticated,)
-    queryset = Painting.objects.all()  # Added .queryset attribute
-    permission_classes = [DjangoModelPermissions]  # Using DjangoModelPermissions
+    # queryset = Painting.objects.all()  # Added .queryset attribute
+    # permission_classes = [DjangoModelPermissions]  # Using DjangoModelPermissions
 
     def get(self, request, painting_ID=None):
         if painting_ID:

@@ -10,9 +10,9 @@ class Painting(models.Model):
     Price = models.IntegerField()
     image = models.FileField(upload_to='paintings/', null=True, blank=True)  
     
-class Meta:
-    permissions = (
-        ("can_create_painting", "Can create painting"),
-        ("can_edit_painting", "Can edit painting"),
-        ("can_delete_painting", "Can delete painting"),
-    )
+# class Meta:
+#     permissions = (
+#         ("can_create_painting", "Can create painting"),
+#         ("can_edit_painting", "Can edit painting"),
+#         ("can_delete_painting", "Can delete painting"),
+#     )
