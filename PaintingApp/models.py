@@ -1,5 +1,15 @@
 from django.db import models
 
+
+class Like(models.Model):
+    user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
+    painting = models.ForeignKey('PaintingApp.Painting', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'painting')
+
+
 class Painting(models.Model):
     ID = models.IntegerField(primary_key=True)
     Title = models.CharField(max_length=200)
