@@ -1,10 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Like, Painting
-from .serializers import PaintingSerializer
+from .models import Comment, Like, Painting
+from .serializers import PaintingSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
+from rest_framework.exceptions import PermissionDenied
 
 class LikePaintingAPIView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -23,8 +24,6 @@ class LikePaintingAPIView(generics.CreateAPIView):
 
 class PaintingApiView(APIView):
     permission_classes = (IsAuthenticated,)
-    # queryset = Painting.objects.all()  # Added .queryset attribute
-    # permission_classes = [DjangoModelPermissions]  # Using DjangoModelPermissions
 
     def get(self, request, painting_ID=None):
         if painting_ID:
@@ -90,3 +89,57 @@ class PaintingApiView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CommentApiView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, painting_ID):
+        try:
+            painting = Painting.objects.get(ID=painting_ID)
+        except Painting.DoesNotExist:
+            return Response({'error': 'Painting not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, painting=painting)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, painting_ID):
+        try:
+            painting = Painting.objects.get(ID=painting_ID)
+        except Painting.DoesNotExist:
+            return Response({'error': 'Painting not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        comments = Comment.objects.filter(painting=painting)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+    
+    
+class CommentDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, painting_id, comment_id):
+        try:
+            comment = Comment.objects.get(id=comment_id, painting_id=painting_id)
+        except Comment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the authenticated user is the owner of the comment
+        if comment.user != request.user:
+            raise PermissionDenied("You do not have permission to delete this comment")
+
+        comment.delete()
+        return Response({'message': 'Comment deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+class PaintingCommentsAPIView(APIView):
+    def get(self, request, painting_ID):
+        try:
+            painting = Painting.objects.get(ID=painting_ID)
+        except Painting.DoesNotExist:
+            return Response({'error': 'Painting not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        comments = Comment.objects.filter(painting=painting)
+        comment_ids = [comment.id for comment in comments]
+
+        return Response({'painting_id': painting_ID, 'comment_ids': comment_ids})

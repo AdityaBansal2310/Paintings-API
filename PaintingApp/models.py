@@ -1,5 +1,5 @@
 from django.db import models
-
+from accounts.models import CustomUser  
 
 class Like(models.Model):
     user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
@@ -9,6 +9,14 @@ class Like(models.Model):
     class Meta:
         unique_together = ('user', 'painting')
 
+class Comment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    painting = models.ForeignKey('PaintingApp.Painting', on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
 class Painting(models.Model):
     ID = models.IntegerField(primary_key=True)
@@ -19,6 +27,7 @@ class Painting(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     Price = models.IntegerField()
     image = models.FileField(upload_to='paintings/', null=True, blank=True)  
+
     
 # class Meta:
 #     permissions = (
